@@ -1,5 +1,6 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const escala = 20; // 1 unidad cartesiana = 20 pixeles
 
 const size = 4;
 
@@ -10,8 +11,8 @@ ctx = contexto del canvas
 x,y = coordenadas
 size = tamaño del punto
 */
-function drawPoint(ctx, x, y, size){
-    ctx.fillRect(x - size/2, y - size/2, size, size);
+function drawPoint(ctx, x, y, size) {
+    ctx.fillRect(x - size / 2, y - size / 2, size, size);
 }
 
 
@@ -22,11 +23,11 @@ a coordenadas del canvas.
 El canvas tiene su origen arriba izquierda,
 por lo que debemos invertir el eje Y.
 */
-function cartesianToCanvas(x, y){
+function cartesianToCanvas(x, y) {
 
     return {
-        x: x,
-        y: canvas.height - y
+        x: x * escala,
+        y: canvas.height - (y * escala)
     };
 
 }
@@ -34,16 +35,16 @@ function cartesianToCanvas(x, y){
 
 /*
 Función que decide qué algoritmo usar
-para dibujala línea.
+para dibujar la línea.
 */
-function drawLine(x1, y1, x2, y2, size, method){
+function drawLine(x1, y1, x2, y2, size, method) {
 
-    if(method === "dda"){
-        drawDDA(x1,y1,x2,y2,size);
+    if (method === "dda") {
+        drawDDA(x1, y1, x2, y2, size);
     }
 
-    if(method === "bresenham"){
-        drawBresenham(x1,y1,x2,y2,size);
+    if (method === "bresenham") {
+        drawBresenham(x1, y1, x2, y2, size);
     }
 
 }
@@ -57,22 +58,22 @@ calcular pequeños incrementos en X e Y
 usando números decimales para aproximar
 la línea ideal.
 */
-function drawDDA(x1,y1,x2,y2,size){
+function drawDDA(x1, y1, x2, y2, size) {
 
-    let dx = x2-x1;
-    let dy = y2-y1;
+    let dx = x2 - x1;
+    let dy = y2 - y1;
 
-    let steps = Math.max(Math.abs(dx),Math.abs(dy));
+    let steps = Math.max(Math.abs(dx), Math.abs(dy));
 
-    let xInc = dx/steps;
-    let yInc = dy/steps;
+    let xInc = dx / steps;
+    let yInc = dy / steps;
 
     let x = x1;
     let y = y1;
 
-    for(let i=0;i<=steps;i++){
+    for (let i = 0; i <= steps; i++) {
 
-        drawPoint(ctx,Math.round(x),Math.round(y),size);
+        drawPoint(ctx, Math.round(x), Math.round(y), size);
 
         x += xInc;
         y += yInc;
@@ -90,30 +91,30 @@ operaciones enteras para determinar
 qué pixel es el más cercano a la línea,
 lo que lo hace más eficiente.
 */
-function drawBresenham(x1,y1,x2,y2,size){
+function drawBresenham(x1, y1, x2, y2, size) {
 
-    let dx = Math.abs(x2-x1);
-    let dy = Math.abs(y2-y1);
+    let dx = Math.abs(x2 - x1);
+    let dy = Math.abs(y2 - y1);
 
     let sx = (x1 < x2) ? 1 : -1;
     let sy = (y1 < y2) ? 1 : -1;
 
     let err = dx - dy;
 
-    while(true){
+    while (true) {
 
-        drawPoint(ctx,x1,y1,size);
+        drawPoint(ctx, x1, y1, size);
 
-        if(x1===x2 && y1===y2) break;
+        if (x1 === x2 && y1 === y2) break;
 
-        let e2 = 2*err;
+        let e2 = 2 * err;
 
-        if(e2 > -dy){
+        if (e2 > -dy) {
             err -= dy;
             x1 += sx;
         }
 
-        if(e2 < dx){
+        if (e2 < dx) {
             err += dx;
             y1 += sy;
         }
@@ -127,28 +128,28 @@ function drawBresenham(x1,y1,x2,y2,size){
 Dibuja la cuadrícula del plano
 y agrega numeración a los ejes.
 */
-function drawGrid(){
+function drawGrid() {
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.strokeStyle="#ccc";
+    ctx.strokeStyle = "#ccc";
 
-    for(let i=0;i<=500;i+=50){
+    for (let i = 0; i <= 500; i += 50) {
 
         ctx.beginPath();
-        ctx.moveTo(i,0);
-        ctx.lineTo(i,500);
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, 500);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(0,i);
-        ctx.lineTo(500,i);
+        ctx.moveTo(0, i);
+        ctx.lineTo(500, i);
         ctx.stroke();
 
-        ctx.fillStyle="black";
+        ctx.fillStyle = "black";
 
-        ctx.fillText(i,i,490);
-        ctx.fillText(i,5,500-i);
+        ctx.fillText(i, i, 490);
+        ctx.fillText(i, 5, 500 - i);
 
     }
 
@@ -162,12 +163,12 @@ Si el área del triángulo es 0,
 los puntos están en la misma línea
 (colineales).
 */
-function esTriangulo(x1,y1,x2,y2,x3,y3){
+function esTriangulo(x1, y1, x2, y2, x3, y3) {
 
     let area =
-        x1*(y2-y3) +
-        x2*(y3-y1) +
-        x3*(y1-y2);
+        x1 * (y2 - y3) +
+        x2 * (y3 - y1) +
+        x3 * (y1 - y2);
 
     return area !== 0;
 
@@ -183,7 +184,7 @@ Función principal del programa.
 4. Verifica si hay triángulo
 5. Dibuja las líneas usando el algoritmo elegido
 */
-function procesar(method){
+function procesar(method) {
 
     drawGrid();
 
@@ -196,28 +197,28 @@ function procesar(method){
     let x3 = Number(document.getElementById("x3").value);
     let y3 = Number(document.getElementById("y3").value);
 
-    let p1 = cartesianToCanvas(x1,y1);
-    let p2 = cartesianToCanvas(x2,y2);
-    let p3 = cartesianToCanvas(x3,y3);
+    let p1 = cartesianToCanvas(x1, y1);
+    let p2 = cartesianToCanvas(x2, y2);
+    let p3 = cartesianToCanvas(x3, y3);
 
-    drawPoint(ctx,p1.x,p1.y,6);
-    drawPoint(ctx,p2.x,p2.y,6);
-    drawPoint(ctx,p3.x,p3.y,6);
+    drawPoint(ctx, p1.x, p1.y, 6);
+    drawPoint(ctx, p2.x, p2.y, 6);
+    drawPoint(ctx, p3.x, p3.y, 6);
 
-    if(esTriangulo(x1,y1,x2,y2,x3,y3)){
+    if (esTriangulo(x1, y1, x2, y2, x3, y3)) {
 
         document.getElementById("resultado").innerText =
-        "Los puntos SI forman un triángulo";
+            "Los puntos SI forman un triángulo";
 
-        drawLine(p1.x,p1.y,p2.x,p2.y,size,method);
-        drawLine(p2.x,p2.y,p3.x,p3.y,size,method);
-        drawLine(p3.x,p3.y,p1.x,p1.y,size,method);
+        drawLine(p1.x, p1.y, p2.x, p2.y, size, method);
+        drawLine(p2.x, p2.y, p3.x, p3.y, size, method);
+        drawLine(p3.x, p3.y, p1.x, p1.y, size, method);
 
     }
-    else{
+    else {
 
         document.getElementById("resultado").innerText =
-        "Los puntos NO forman un triángulo";
+            "Los puntos NO forman un triángulo";
 
     }
 
