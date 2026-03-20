@@ -1,8 +1,9 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-const escala = 20; // 1 unidad cartesiana = 20 pixeles
 
+let escala = 20;
 const size = 4;
+
 
 /* ================= UTILIDADES ================= */
 
@@ -16,26 +17,21 @@ function crearPunto(x, y) {
     return { x, y };
 }
 
+
 /* ================= DIBUJO ================= */
 
-//Dibuja un punto en el canvas.
 function drawPoint(ctx, x, y, size) {
     ctx.fillRect(x - size / 2, y - size / 2, size, size);
 }
 
-//Convierte coordenadas del plano cartesianoa coordenadas del canvas.
-function cartesianToCanvas(x, y) {
-
+function cartesianToCanvas(p) {
     return {
         x: p.x * escala,
         y: canvas.height - (p.y * escala)
     };
-
 }
 
 
-
-//Función que decide qué algoritmo usar para dibujar la línea.
 function drawLine(p1, p2, method) {
 
     if (method === "dda") return drawDDA(p1, p2);
@@ -99,13 +95,12 @@ function drawBresenham(p1, p2) {
     }
 }
 
+
 /* ================= GRID ================= */
 
-//Dibuja la cuadrícula del plano y agrega numeración a los ejes.
 function drawGrid() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     ctx.strokeStyle = "#ccc";
 
     for (let i = 0; i <= canvas.width; i += escala) {
@@ -120,18 +115,15 @@ function drawGrid() {
         ctx.lineTo(canvas.width, i);
         ctx.stroke();
 
-        // Numeración real (no pixeles)
-        ctx.fillStyle = "black";
+        let val = i / escala;
 
-        let valor = i / escala;
-
-        ctx.fillText(valor, i, canvas.height - 5);
-        ctx.fillText(valor, 5, canvas.height - i);
+        ctx.fillText(val, i, canvas.height - 5);
+        ctx.fillText(val, 5, canvas.height - i);
     }
 }
 
+
 /* ================= LÓGICA ================= */
-//Verifica si tres puntos forman un triángulo.si el área del triángulo es 0,los puntos están en la misma línea
 
 function esTriangulo(p1, p2, p3) {
 
@@ -142,16 +134,10 @@ function esTriangulo(p1, p2, p3) {
 
     return area !== 0;
 }
-/* ================= MAIN ================= */
-/*
-Función principal del programa.
 
-1. Lee los datos del usuario
-2. Convierte coordenadas
-3. Dibuja puntos
-4. Verifica si hay triángulo
-5. Dibuja las líneas usando el algoritmo elegido
-*/
+
+/* ================= MAIN ================= */
+
 function procesar(method) {
 
     drawGrid();
