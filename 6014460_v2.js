@@ -16,93 +16,60 @@ function crearPunto(x, y) {
     return { x, y };
 }
 
-/*
-Dibuja un punto en el canvas.
-ctx = contexto del canvas
-x,y = coordenadas
-size = tamaño del punto
-*/
+/* ================= DIBUJO ================= */
+
+//Dibuja un punto en el canvas.
 function drawPoint(ctx, x, y, size) {
     ctx.fillRect(x - size / 2, y - size / 2, size, size);
 }
 
-
-/*
-Convierte coordenadas del plano cartesiano
-a coordenadas del canvas.
-
-El canvas tiene su origen arriba izquierda,
-por lo que debemos invertir el eje Y.
-*/
+//Convierte coordenadas del plano cartesianoa coordenadas del canvas.
 function cartesianToCanvas(x, y) {
 
     return {
-        x: x * escala,
-        y: canvas.height - (y * escala)
+        x: p.x * escala,
+        y: canvas.height - (p.y * escala)
     };
 
 }
 
 
-/*
-Función que decide qué algoritmo usar
-para dibujar la línea.
-*/
-function drawLine(x1, y1, x2, y2, size, method) {
 
-    if (method === "dda") {
-        drawDDA(x1, y1, x2, y2, size);
-    }
+//Función que decide qué algoritmo usar para dibujar la línea.
+function drawLine(p1, p2, method) {
 
-    if (method === "bresenham") {
-        drawBresenham(x1, y1, x2, y2, size);
-    }
-
+    if (method === "dda") return drawDDA(p1, p2);
+    return drawBresenham(p1, p2);
 }
 
 
-/*
-Algoritmo DDA (Digital Differential Analyzer)
+/* ===== DDA ===== */
+function drawDDA(p1, p2) {
 
-Idea principal:
-calcular pequeños incrementos en X e Y
-usando números decimales para aproximar
-la línea ideal.
-*/
-function drawDDA(x1, y1, x2, y2, size) {
-
-    let dx = x2 - x1;
-    let dy = y2 - y1;
+    let dx = p2.x - p1.x;
+    let dy = p2.y - p1.y;
 
     let steps = Math.max(Math.abs(dx), Math.abs(dy));
 
     let xInc = dx / steps;
     let yInc = dy / steps;
 
-    let x = x1;
-    let y = y1;
+    let x = p1.x;
+    let y = p1.y;
 
     for (let i = 0; i <= steps; i++) {
-
         drawPoint(ctx, Math.round(x), Math.round(y), size);
-
         x += xInc;
         y += yInc;
-
     }
-
 }
 
 
-/*
-Algoritmo de Bresenham
+/* ===== Bresenham ===== */
+function drawBresenham(p1, p2) {
 
-Este algoritmo utiliza únicamente
-operaciones enteras para determinar
-qué pixel es el más cercano a la línea,
-lo que lo hace más eficiente.
-*/
-function drawBresenham(x1, y1, x2, y2, size) {
+    let x1 = p1.x, y1 = p1.y;
+    let x2 = p2.x, y2 = p2.y;
 
     let dx = Math.abs(x2 - x1);
     let dy = Math.abs(y2 - y1);
@@ -129,16 +96,12 @@ function drawBresenham(x1, y1, x2, y2, size) {
             err += dx;
             y1 += sy;
         }
-
     }
-
 }
 
+/* ================= GRID ================= */
 
-/*
-Dibuja la cuadrícula del plano
-y agrega numeración a los ejes.
-*/
+//Dibuja la cuadrícula del plano y agrega numeración a los ejes.
 function drawGrid() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -167,26 +130,19 @@ function drawGrid() {
     }
 }
 
+/* ================= LÓGICA ================= */
+//Verifica si tres puntos forman un triángulo.si el área del triángulo es 0,los puntos están en la misma línea
 
-/*
-Verifica si tres puntos forman un triángulo.
-
-Si el área del triángulo es 0,
-los puntos están en la misma línea
-(colineales).
-*/
-function esTriangulo(x1, y1, x2, y2, x3, y3) {
+function esTriangulo(p1, p2, p3) {
 
     let area =
-        x1 * (y2 - y3) +
-        x2 * (y3 - y1) +
-        x3 * (y1 - y2);
+        p1.x * (p2.y - p3.y) +
+        p2.x * (p3.y - p1.y) +
+        p3.x * (p1.y - p2.y);
 
     return area !== 0;
-
 }
-
-
+/* ================= MAIN ================= */
 /*
 Función principal del programa.
 
@@ -200,41 +156,36 @@ function procesar(method) {
 
     drawGrid();
 
-    let x1 = Number(document.getElementById("x1").value);
-    let y1 = Number(document.getElementById("y1").value);
+    // Leer puntos
+    let puntos = [
+        crearPunto(getInput("x1"), getInput("y1")),
+        crearPunto(getInput("x2"), getInput("y2")),
+        crearPunto(getInput("x3"), getInput("y3"))
+    ];
 
-    let x2 = Number(document.getElementById("x2").value);
-    let y2 = Number(document.getElementById("y2").value);
+    // Convertir a canvas
+    let puntosCanvas = puntos.map(cartesianToCanvas);
 
-    let x3 = Number(document.getElementById("x3").value);
-    let y3 = Number(document.getElementById("y3").value);
+    // Dibujar puntos
+    puntosCanvas.forEach(p => drawPoint(ctx, p.x, p.y, 6));
 
-    let p1 = cartesianToCanvas(x1, y1);
-    let p2 = cartesianToCanvas(x2, y2);
-    let p3 = cartesianToCanvas(x3, y3);
-
-    drawPoint(ctx, p1.x, p1.y, 6);
-    drawPoint(ctx, p2.x, p2.y, 6);
-    drawPoint(ctx, p3.x, p3.y, 6);
-
-    if (esTriangulo(x1, y1, x2, y2, x3, y3)) {
+    if (esTriangulo(...puntos)) {
 
         document.getElementById("resultado").innerText =
-            "Los puntos SI forman un triángulo";
+            "SI forman un triángulo";
 
-        drawLine(p1.x, p1.y, p2.x, p2.y, size, method);
-        drawLine(p2.x, p2.y, p3.x, p3.y, size, method);
-        drawLine(p3.x, p3.y, p1.x, p1.y, size, method);
+        // Dibujar lados con loop
+        for (let i = 0; i < 3; i++) {
+            let p1 = puntosCanvas[i];
+            let p2 = puntosCanvas[(i + 1) % 3];
+            drawLine(p1, p2, method);
+        }
 
-    }
-    else {
+    } else {
 
         document.getElementById("resultado").innerText =
-            "Los puntos NO forman un triángulo";
-
+            "NO forman un triángulo";
     }
-
 }
-
 
 drawGrid();
