@@ -34,7 +34,7 @@ function cartesianToCanvas(x, y){
 
 /*
 Función que decide qué algoritmo usar
-para dibujar la línea.
+para dibujala línea.
 */
 function drawLine(x1, y1, x2, y2, size, method){
 
