@@ -134,25 +134,26 @@ function drawGrid() {
 
     ctx.strokeStyle = "#ccc";
 
-    for (let i = 0; i <= 500; i += 50) {
+    for (let i = 0; i <= canvas.width; i += escala) {
 
         ctx.beginPath();
         ctx.moveTo(i, 0);
-        ctx.lineTo(i, 500);
+        ctx.lineTo(i, canvas.height);
         ctx.stroke();
 
         ctx.beginPath();
         ctx.moveTo(0, i);
-        ctx.lineTo(500, i);
+        ctx.lineTo(canvas.width, i);
         ctx.stroke();
 
+        // Numeración real (no pixeles)
         ctx.fillStyle = "black";
 
-        ctx.fillText(i, i, 490);
-        ctx.fillText(i, 5, 500 - i);
+        let valor = i / escala;
 
+        ctx.fillText(valor, i, canvas.height - 5);
+        ctx.fillText(valor, 5, canvas.height - i);
     }
-
 }
 
 
