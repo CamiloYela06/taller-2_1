@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<!-- Título que aparece en la pestaña del navegador -->
+<title>Triángulo con DDA y Bresenham</title>
+
+<style>
+
+/* Estilo general de la página */
+body{
+    font-family: Arial;
+    text-align: center;
+}
+
+/* Estilo del canvas donde se dibuja el plano */
+canvas{
+    border:1px solid black;
+    margin-top:20px;
+}
+
+/* Tamaño de los cuadros de entrada */
+input{
+    width:60px;
+    margin:5px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Título principal del programa -->
+<h2>Verificar si tres puntos forman un triángulo</h2>
+
+<!-- Entradas para el punto 1 -->
+<p>
+Punto 1:
+X <input id="x1">
+Y <input id="y1">
+</p>
+
+<!-- Entradas para el punto 2 -->
+<p>
+Punto 2:
+X <input id="x2">
+Y <input id="y2">
+</p>
+
+<!-- Entradas para el punto 3 -->
+<p>
+Punto 3:
+X <input id="x3">
+Y <input id="y3">
+</p>
+
+<!-- Botones para elegir el algoritmo de dibujo -->
+<p>
+<button onclick="procesar('dda')">Usar algoritmo DDA</button>
+
+<button onclick="procesar('bresenham')">Usar algoritmo Bresenham</button>
+</p>
+
+<!-- Lugar donde se mostrará el resultado -->
+<h3 id="resultado"></h3>
+
+<!-- Canvas donde se dibujará el plano cartesiano -->
+<canvas id="canvas" width="500" height="500"></canvas>
+
+<!-- Conexión con el archivo JavaScript -->
+<script src="6014460.js"></script>
+
+</body>
+</html>
