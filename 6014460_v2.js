@@ -4,6 +4,17 @@ const escala = 20; // 1 unidad cartesiana = 20 pixeles
 
 const size = 4;
 
+/* ================= UTILIDADES ================= */
+
+// Obtener número desde input
+function getInput(id) {
+    return Number(document.getElementById(id).value);
+}
+
+// Crear punto
+function crearPunto(x, y) {
+    return { x, y };
+}
 
 /*
 Dibuja un punto en el canvas.
